@@ -1,0 +1,14 @@
+namespace: "markuman"
+description: nessus collection
+name: "nessus"
+version: "0.0.1"
+readme: "README.md"
+authors:
+    - "Markus Bergholz <markuman+spambelongstogoogle@gmail.com>"
+license:
+    - "GPL-3.0-or-later"
+tags:
+    - nessus
+    - collection
+repository: "https://git.osuv.de/m/nessus_collection"
+issues: https://github.com/markuman/nessus_collection

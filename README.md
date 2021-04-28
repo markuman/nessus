@@ -18,9 +18,14 @@ This is helpfull, because you can throw your (dynamic) inventory files on an exi
         targets:
             - 10.0.0.1
             - 10.0.0.32
-        task: "183"
+        task: task_name
         host: nessus.mydomain.tld
         username: nessus_user
         password: nessus_password
 ```
 
+## install
+
+* `ansible-galaxy collection install markuman.nessus`
+* `pip3 install selenium --user`
+  * Gecko Driver https://github.com/mozilla/geckodriver/releases install to `~/.local/bin/`

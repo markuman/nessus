@@ -1,0 +1,13 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+
+  tasks:
+    - name: update nessus task
+      markuman.nessus.task:
+        targets:
+          - 10.85.10.85
+        task: AnsibleTest
+        host: nessus.osuv.de
+        headless: no

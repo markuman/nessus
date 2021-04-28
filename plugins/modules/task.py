@@ -23,12 +23,34 @@ from selenium import webdriver
 import time
 from selenium.webdriver.firefox.options import Options
 from pathlib import Path
+import requests
 
 
-def wer_braucht_schon_eine_api(task, targets, username, password, host):
+def wer_braucht_schon_eine_api(task, targets, username, password, host, headless):
+
+    post_data = {
+        'username': username,
+        'password': password
+    }
+    response = requests.post(f'https://{host}/session', data=post_data)
+    if response.status_code == 200:
+        token = response.json().get('token')
+        header = {
+            "X-Cookie":f"token={token}",
+            "Content-Type":"application/json"
+        }
+        response = requests.get(f'https://{host}/scans', headers=header)
+
+        if response.status_code == 200:
+            scans = response.json().get('scans')
+
+            for scan in scans:
+                if task == scan.get('name'):
+                    task_id = scan.get('id')
+
 
     options = Options()
-    options.headless = True
+    options.headless = headless
 
     driver = webdriver.Firefox(str(Path.home()) + '/.local/bin/', options=options)
     print ("Headless Firefox Initialized")
@@ -46,7 +68,7 @@ def wer_braucht_schon_eine_api(task, targets, username, password, host):
 
     time.sleep(5)
 
-    driver.get('https://{HOST}/#/scans/reports/{TASK}/config/settings/basic/general'.format(TASK=task, HOST=host))
+    driver.get(f'https://{host}/#/scans/reports/{task_id}/config/settings/basic/general')
 
     time.sleep(5)
     targets_element = "/html/body/section[3]/section[3]/section/form/div/div/div/div[1]/section/div[1]/div[1]/div[1]/div[5]/div/textarea"
@@ -76,18 +98,20 @@ def main():
             password = dict(required=False, type='str', no_log=True),
             username = dict(required=False, type='str'),
             task = dict(required=True, type='str'),
-            host = dict(required=True, type='str')
+            host = dict(required=True, type='str'),
+            headless = dict(required=False, type='bool', default=False)
         )
     )
 
 
-    raw_targets = module.params.get("targets")
-    password = module.params.get("password")
-    username = module.params.get("username")
+    targets = module.params.get("targets")
+    password = module.params.get("password") or os.environ.get('NESSUS_PASSWORD')
+    username = module.params.get("username") or os.environ.get('NESSUS_USERNAME')
     task = module.params.get("task")
     host = module.params.get("host")
+    headless = module.params.get("headless")
 
-    change = wer_braucht_schon_eine_api(task, ips, username, password, host)
+    change = wer_braucht_schon_eine_api(task, targets, username, password, host, headless)
     module.exit_json(changed=change)
     
 
