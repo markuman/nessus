@@ -24,9 +24,21 @@ import time
 from selenium.webdriver.firefox.options import Options
 from pathlib import Path
 import requests
+import yaml
 
 
-def wer_braucht_schon_eine_api(task, targets, username, password, host, headless):
+def diff_handler(before=[], after=[]):
+    before = "".join(before.split()).split(',')
+    before.sort()
+    after.sort()
+
+    return dict(
+        before=yaml.safe_dump(before),
+        after=yaml.safe_dump(after)
+    )
+
+
+def wer_braucht_schon_eine_api(task, targets, username, password, host, headless, fail_json, check_mode):
 
     post_data = {
         'username': username,
@@ -47,6 +59,11 @@ def wer_braucht_schon_eine_api(task, targets, username, password, host, headless
             for scan in scans:
                 if task == scan.get('name'):
                     task_id = scan.get('id')
+
+        else:
+            fail_json(msg=f'List Scans Failed. Status Code {response.status_code}')
+    else:
+        fail_json(msg=f'Login Failed. Status Code {response.status_code}')
 
 
     options = Options()
@@ -75,12 +92,19 @@ def wer_braucht_schon_eine_api(task, targets, username, password, host, headless
 
     change = False
     existing = driver.find_element_by_xpath(targets_element).text
+    diff = diff_handler(existing, targets)
     for item in targets:
         if item not in existing:
             change = True
             break
 
-    if change:
+    if not change:
+        for item in "".join(existing.split()).split(','):
+            if item not in targets:
+                change = True
+                break
+
+    if change and not check_mode:
         driver.find_element_by_xpath(targets_element).clear()
         driver.find_element_by_xpath(targets_element).send_keys(','.join(targets))
         save = "/html/body/section[3]/section[3]/section/form/button"
@@ -89,7 +113,7 @@ def wer_braucht_schon_eine_api(task, targets, username, password, host, headless
     time.sleep(5)
 
     driver.quit()
-    return change
+    return change, diff
 
 def main():
     module = AnsibleModule(
@@ -100,7 +124,8 @@ def main():
             task = dict(required=True, type='str'),
             host = dict(required=True, type='str'),
             headless = dict(required=False, type='bool', default=False)
-        )
+        ),
+        supports_check_mode=True
     )
 
 
@@ -111,8 +136,8 @@ def main():
     host = module.params.get("host")
     headless = module.params.get("headless")
 
-    change = wer_braucht_schon_eine_api(task, targets, username, password, host, headless)
-    module.exit_json(changed=change)
+    change, diff = wer_braucht_schon_eine_api(task, targets, username, password, host, headless, module.fail_json, module.check_mode)
+    module.exit_json(changed=change, diff=diff)
     
 
 if __name__ == '__main__':
