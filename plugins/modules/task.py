@@ -1,6 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Part of ansible markuman.nessus collection
+
+
 DOCUMENTATION = '''
 module: markuman.nessus.task
 short_description: create or modify nessus tasks
@@ -12,7 +16,7 @@ EXAMPLES = '''
         targets:
             - 10.0.0.1
             - 10.0.0.32
-        task: "183"
+        task: nessus task name
         host: nessus.mydomain.tld
         username: nessus_user
         password: nessus_password
