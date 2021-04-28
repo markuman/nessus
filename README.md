@@ -4,7 +4,8 @@ This Ansible Collection brings back Nessus Task Automation ✊
 
 ## How does it work
 
-Since `post` and `put` api requests result in status code `412` using nessus on-premise, the ansible collection uses simple selenium and firefox to create or update tasks.
+Since `post` and `put` api requests result in status code `412` using nessus on-premise, the ansible collection uses simple selenium and firefox to create or update tasks.  
+[See it in action](https://home.osuv.de/apps/sharingpath/m/pub/ansible_nessus.gif).
 
 ## Status
 
