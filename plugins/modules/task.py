@@ -38,7 +38,7 @@ def diff_handler(before=[], after=[]):
     )
 
 
-def wer_braucht_schon_eine_api(task, targets, username, password, host, headless, fail_json, check_mode):
+def wer_braucht_schon_eine_api(task, targets, username, password, host, headless, fail_json, check_mode, purge):
 
     post_data = {
         'username': username,
@@ -98,7 +98,7 @@ def wer_braucht_schon_eine_api(task, targets, username, password, host, headless
             change = True
             break
 
-    if not change:
+    if not change and purge:
         for item in "".join(existing.split()).split(','):
             if item not in targets:
                 change = True
@@ -123,7 +123,8 @@ def main():
             username = dict(required=False, type='str'),
             task = dict(required=True, type='str'),
             host = dict(required=True, type='str'),
-            headless = dict(required=False, type='bool', default=False)
+            headless = dict(required=False, type='bool', default=False),
+            purge = dict(required=False, type='bool', default=True, aliases=['replace', 'overwrite', 'solo'])
         ),
         supports_check_mode=True
     )
@@ -135,8 +136,9 @@ def main():
     task = module.params.get("task")
     host = module.params.get("host")
     headless = module.params.get("headless")
+    purge = module.params.get("purge")
 
-    change, diff = wer_braucht_schon_eine_api(task, targets, username, password, host, headless, module.fail_json, module.check_mode)
+    change, diff = wer_braucht_schon_eine_api(task, targets, username, password, host, headless, module.fail_json, module.check_mode, purge)
     module.exit_json(changed=change, diff=diff)
     
 
