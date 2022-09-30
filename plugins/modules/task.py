@@ -73,49 +73,67 @@ def wer_braucht_schon_eine_api(task, targets, username, password, host, headless
     options = Options()
     options.headless = headless
 
-    driver = webdriver.Firefox(str(Path.home()) + '/.local/bin/', options=options)
-    print ("Headless Firefox Initialized")
-    driver.get('https://' + host)
+    headless_factor = 0
+    if not headless:
+        headless_factor = 3
 
-    time.sleep(3)
+    driver = webdriver.Firefox(str(Path.home()) + '/.local/bin/', options=options)
+    driver.get('https://' + host)
 
     username_input = "/html/body/div/form/div[1]/input"
     password_input = "/html/body/div/form/div[2]/input" 
     login_submit = "/html/body/div/form/button"
 
-    driver.find_element_by_xpath(username_input).send_keys(username)
-    driver.find_element_by_xpath(password_input).send_keys(password)
-    driver.find_element_by_xpath(login_submit).click()
+    time.sleep(0.1+headless_factor)
+    while True:
+        try:
+            driver.find_element_by_xpath(username_input).send_keys(username)
+            driver.find_element_by_xpath(password_input).send_keys(password)
+            driver.find_element_by_xpath(login_submit).click()
+        except:
+            time.sleep(0.1+headless_factor)
+            continue
+        break
 
-    time.sleep(5)
+    time.sleep(0.1)
+    while True:
+        try:
+            driver.get(f'https://{host}/#/scans/reports/{task_id}/config/settings/basic/general')
+        except:
+            time.sleep(0.1+headless_factor)
+            continue
+        break
 
-    driver.get(f'https://{host}/#/scans/reports/{task_id}/config/settings/basic/general')
+    time.sleep(0.1+headless_factor)
+    while True:
+        try:
+            targets_element = "/html/body/section[3]/section[3]/section/form/div/div/div/div[1]/section/div[1]/div[1]/div[1]/div[5]/div/textarea"
 
-    time.sleep(5)
-    targets_element = "/html/body/section[3]/section[3]/section/form/div/div/div/div[1]/section/div[1]/div[1]/div[1]/div[5]/div/textarea"
+            change = False
+            existing = driver.find_element_by_xpath(targets_element).text
+            diff = diff_handler(existing, targets)
+            for item in targets:
+                if item not in existing:
+                    change = True
+                    break
 
-    change = False
-    existing = driver.find_element_by_xpath(targets_element).text
-    diff = diff_handler(existing, targets)
-    for item in targets:
-        if item not in existing:
-            change = True
-            break
+            if not change and purge:
+                for item in "".join(existing.split()).split(','):
+                    if item not in targets:
+                        change = True
+                        break
 
-    if not change and purge:
-        for item in "".join(existing.split()).split(','):
-            if item not in targets:
-                change = True
-                break
+            if change and not check_mode:
+                driver.find_element_by_xpath(targets_element).clear()
+                driver.find_element_by_xpath(targets_element).send_keys(','.join(targets))
+                save = "/html/body/section[3]/section[3]/section/form/button"
+                driver.find_element_by_xpath(save).click()
+        except:
+            time.sleep(0.1+headless_factor)
+            continue
+        break
 
-    if change and not check_mode:
-        driver.find_element_by_xpath(targets_element).clear()
-        driver.find_element_by_xpath(targets_element).send_keys(','.join(targets))
-        save = "/html/body/section[3]/section[3]/section/form/button"
-        driver.find_element_by_xpath(save).click()
-
-    time.sleep(5)
-
+    time.sleep(0.2+headless_factor)
     driver.quit()
     return change, diff
 
@@ -127,7 +145,7 @@ def main():
             username = dict(required=False, type='str'),
             task = dict(required=True, type='str'),
             host = dict(required=True, type='str'),
-            headless = dict(required=False, type='bool', default=False),
+            headless = dict(required=False, type='bool', default=True),
             purge = dict(required=False, type='bool', default=True, aliases=['replace', 'overwrite', 'solo'])
         ),
         supports_check_mode=True
