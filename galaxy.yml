@@ -1,7 +1,7 @@
 namespace: "markuman"
 description: brings back Nessus Task Automation ✊
 name: "nessus"
-version: "0.0.4"
+version: "0.0.5"
 readme: "README.md"
 authors:
     - "Markus Bergholz <markuman+spambelongstogoogle@gmail.com>"
