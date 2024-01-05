@@ -29,7 +29,7 @@ The intention is, that you throw your dynamic inventories into nessus tasks/scan
 
 * `ansible-galaxy collection install markuman.nessus`
 * `pip3 install selenium --user`
-  * Gecko Driver https://github.com/mozilla/geckodriver/releases install to `~/.local/bin/`
+  * Gecko Driver https://github.com/mozilla/geckodriver/releases install to your `$PATH`
 
 ## Auth
 
@@ -58,7 +58,7 @@ Just use your nessus username and password.
 
 | **host** | **category** |
 | --- | --- |
-| https://git.osuv.de/m/nessus | origin |
+| https://gitea.osuv.de/m/nessus | origin |
 | https://gitlab.com/markuman/nessus | pull mirror, issues, MR |
 | https://github.com/markuman/nessus | push mirror, issues, PR |
 

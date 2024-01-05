@@ -1,7 +1,7 @@
 namespace: "markuman"
 description: brings back Nessus Task Automation ✊
 name: "nessus"
-version: "0.0.5"
+version: "0.0.6"
 readme: "README.md"
 authors:
     - "Markus Bergholz <markuman+spambelongstogoogle@gmail.com>"
@@ -11,5 +11,5 @@ tags:
     - nessus
     - collection
     - security
-repository: https://git.osuv.de/m/nessus
+repository: https://gitea.osuv.de/m/nessus
 issues: https://github.com/markuman/nessus

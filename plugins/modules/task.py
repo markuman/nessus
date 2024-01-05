@@ -77,7 +77,7 @@ def wer_braucht_schon_eine_api(task, targets, username, password, host, headless
     if not headless:
         headless_factor = 3
 
-    driver = webdriver.Firefox(str(Path.home()) + '/.local/bin/', options=options)
+    driver = webdriver.Firefox(options=options)
     driver.get('https://' + host)
 
     username_input = "/html/body/div/form/div[1]/input"
@@ -87,9 +87,9 @@ def wer_braucht_schon_eine_api(task, targets, username, password, host, headless
     time.sleep(0.1+headless_factor)
     while True:
         try:
-            driver.find_element_by_xpath(username_input).send_keys(username)
-            driver.find_element_by_xpath(password_input).send_keys(password)
-            driver.find_element_by_xpath(login_submit).click()
+            driver.find_element("xpath", username_input).send_keys(username)
+            driver.find_element("xpath", password_input).send_keys(password)
+            driver.find_element("xpath", login_submit).click()
         except:
             time.sleep(0.1+headless_factor)
             continue
@@ -110,7 +110,7 @@ def wer_braucht_schon_eine_api(task, targets, username, password, host, headless
             targets_element = "/html/body/section[3]/section[3]/section/form/div/div/div/div[1]/section/div[1]/div[1]/div[1]/div[5]/div/textarea"
 
             change = False
-            existing = driver.find_element_by_xpath(targets_element).text
+            existing = driver.find_element("xpath", targets_element).text
             diff = diff_handler(existing, targets)
             for item in targets:
                 if item not in existing:
@@ -124,10 +124,10 @@ def wer_braucht_schon_eine_api(task, targets, username, password, host, headless
                         break
 
             if change and not check_mode:
-                driver.find_element_by_xpath(targets_element).clear()
-                driver.find_element_by_xpath(targets_element).send_keys(','.join(targets))
+                driver.find_element("xpath", targets_element).clear()
+                driver.find_element("xpath", targets_element).send_keys(','.join(targets))
                 save = "/html/body/section[3]/section[3]/section/form/button"
-                driver.find_element_by_xpath(save).click()
+                driver.find_element("xpath", save).click()
         except:
             time.sleep(0.1+headless_factor)
             continue
